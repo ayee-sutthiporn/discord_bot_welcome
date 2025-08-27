@@ -18,7 +18,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            cd /srv/miyo/bot_welcome
+            cd /srv/apps/miyo/bot_welcome
             # ดึงโค้ดล่าสุด
             git fetch --all
             git reset --hard origin/main
