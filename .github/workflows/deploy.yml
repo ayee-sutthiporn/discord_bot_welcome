@@ -1,0 +1,29 @@
+name: Deploy
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            cd /srv/miyo/bot_welcome
+            # ดึงโค้ดล่าสุด
+            git fetch --all
+            git reset --hard origin/main
+            # ติดตั้งแพ็กเกจเฉพาะโปรดักชัน
+            npm ci --omit=dev || npm install --omit=dev
+            # รีโหลดแอป
+            pm2 reload miyo_bot_welcome || pm2 start index.js --name miyo_bot_welcome
+            pm2 save
